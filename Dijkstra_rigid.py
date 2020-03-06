@@ -5,8 +5,8 @@ start_coord_row = int(input("Enter the starting row coordinates of the node(1-20
 start_coord_column = int(input("Enter the starting column coordinates of the node(1-300):  ")) 
 goal_coord_row = int(input("Enter the starting goal node row coordintes(1-200):  "))
 goal_coord_column = int(input("Enter the starting goal node column coordinates(1-300):  "))
-radius = int(input("Enter the radius of the rigid robot. Enter 0 if you want a simulation for a point robot:  "))
-clearance = int(input("Enter the max clearnace you want the robot to maintain from an obstacle. Enter 0 if you want a simulation for a point robot:  "))
+radius = int(input("Enter the radius of the rigid robot:  "))
+clearance = int(input("Enter the max clearnace you want the robot to maintain from an obstacle:  "))
         
 start_coord = (start_coord_row,start_coord_column)
 goal_coord = (goal_coord_row, goal_coord_column)
