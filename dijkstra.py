@@ -280,8 +280,8 @@ class Node:
         frame = np.zeros((self.rows,self.columns,3),dtype = np.uint8)
         
         # Create a VideoWriter object to save continous frame sequences to form an animation
-        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter(str(prev),fourcc,20,(self.rows,self.columns)) # Output Video, codec, frames per second, size
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter(str(prev),fourcc,20,(self.columns,self.rows)) # Output Video, codec, frames per second, size
         
         for node in explored_nodes:
             frame[int(self.rows-node[0]-1),int(node[1])] = (255,0,0)
