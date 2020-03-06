@@ -1,9 +1,9 @@
 import numpy as np 
 import cv2
 import sys
+import heapq
 import argparse
 import matplotlib.pyplot as plt
-
 class Node:
     
     def __init__(self,start_coord,goal_coord,radius,clearance):
@@ -44,6 +44,9 @@ class Node:
         
         distRobot1 = (smallTriangleArea1 + smallTriangleArea2 + smallTriangleArea3) - (bigTriangleArea1)
         
+        if(distRobot1 < 1e-5):
+            distRobot1 = 0
+        
         "Second triangle of the rhombus"
         bigTriangleArea2 = self.calAreaOfTriangle(10-np.sqrt(2)*(radiusClearanceSum),225,25,250+np.sqrt(2)*(radiusClearanceSum),40+np.sqrt(2)*(radiusClearanceSum),225)
         smallTriangleArea2_1 = self.calAreaOfTriangle(x_row,y_column,25,250+np.sqrt(2)*(radiusClearanceSum),40+np.sqrt(2)*(radiusClearanceSum),225)
@@ -52,6 +55,9 @@ class Node:
         
         distRobot2 = (smallTriangleArea2_1 + smallTriangleArea2_2 + smallTriangleArea2_3) - (bigTriangleArea2)
         
+        if(distRobot2 < 1e-5):
+            distRobot2 = 0
+            
         "Condition for whether the robot is nearing the RECTANGLE on an ANGLE obstacle"
         "First triangle of the angled rectangle"
         bigTriangleArea1 = self.calAreaOfTriangle(30-np.sqrt(2)*(radiusClearanceSum),95,67.5,30.05-np.sqrt(2)*(radiusClearanceSum),76.15+np.sqrt(2)*(radiusClearanceSum),35.5)
@@ -84,6 +90,9 @@ class Node:
         
         distRobot5 = (smallTriangleArea1 + smallTriangleArea2 + smallTriangleArea3) - (bigTriangleArea1)
         
+        if(distRobot5 < 1e-5):
+            distRobot5 = 0
+            
         " Second Triangle part of the square enclosed inside the polygon"
         bigTriangleArea2 = self.calAreaOfTriangle(120-np.sqrt(2)*(radiusClearanceSum),75,150,100+np.sqrt(2)*(radiusClearanceSum),185+(radiusClearanceSum),75+(0.714*radiusClearanceSum))
         smallTriangleArea2_1 = self.calAreaOfTriangle(x_row,y_column,150,100+np.sqrt(2)*(radiusClearanceSum),185+(radiusClearanceSum),75+(0.714*radiusClearanceSum))
@@ -92,6 +101,8 @@ class Node:
         
         distRobot6 = (smallTriangleArea2_1 + smallTriangleArea2_2 + smallTriangleArea2_3) - (bigTriangleArea2)
         
+        if(distRobot6 < 1e-5):
+            distRobot6 = 0
 
         "EVALUATING THE TRIANGLE PART OF THE NON CONVEX POLYGON"
         bigTriangleArea1 = self.calAreaOfTriangle(120-(2.62*radiusClearanceSum),20-(1.205*radiusClearanceSum),150-(np.sqrt(2)*radiusClearanceSum),50,185+radiusClearanceSum,25-(radiusClearanceSum*1.081)) 
@@ -100,6 +111,9 @@ class Node:
         smallTriangleArea3 = self.calAreaOfTriangle(x_row,y_column,120-(2.62*radiusClearanceSum),20-(1.205*radiusClearanceSum),150-(np.sqrt(2)*radiusClearanceSum),50)
         
         distRobot7 = (smallTriangleArea1 + smallTriangleArea2 + smallTriangleArea3) - (bigTriangleArea1)
+        
+        if(distRobot7 < 1e-5):
+            distRobot1 = 0
 
         bigTriangleArea2 = self.calAreaOfTriangle(150-(np.sqrt(2)*radiusClearanceSum),50,185+radiusClearanceSum,25-(1.081*radiusClearanceSum),185+radiusClearanceSum,75+(radiusClearanceSum*0.714))
         smallTriangleArea2_1 = self.calAreaOfTriangle(x_row,y_column,150-(np.sqrt(2)*radiusClearanceSum),50,185+radiusClearanceSum,25-(1.081*radiusClearanceSum))
@@ -107,6 +121,9 @@ class Node:
         smallTriangleArea2_3 = self.calAreaOfTriangle(x_row,y_column,185+radiusClearanceSum,25-(1.081*radiusClearanceSum),185+radiusClearanceSum,75+(radiusClearanceSum*0.714))
 
         distRobot8 = (smallTriangleArea2_1 + smallTriangleArea2_2 + smallTriangleArea2_3) - (bigTriangleArea2)
+        
+        if(distRobot8 < 1e-5):
+            distRobot8 = 0
     
         if(circdist<=0 or ellipticalDist<=0 or distRobot1 == 0 or distRobot2 == 0 or distRobot3 == 0 or distRobot4 == 0 or distRobot5 == 0 or distRobot6 == 0 or distRobot7 == 0 or distRobot8 == 0):
             return True
@@ -191,7 +208,7 @@ class Node:
         while(len(priority_queue) > 0):
             
             # First we pop from the priority queue
-            dist , node = heappop(priority_queue)
+            dist , node = heapq.heappop(priority_queue)
             visited_nodes[node] = True
             explored_nodes.append(node)
             
@@ -267,7 +284,8 @@ class Node:
         out = cv2.VideoWriter(str(prev),fourcc,20,(self.rows,self.columns)) # Output Video, codec, frames per second, size
         
         for node in explored_nodes:
-            frame[int(self.rows-node[0]-1),int(node[1])] = (255,255,0)
+            frame[int(self.rows-node[0]-1),int(node[1])] = (255,0,0)
+            out.write(frame)
             
         for row in range(0,self.rows):
             for column in range(0,self.columns):
@@ -275,7 +293,8 @@ class Node:
                 # Check for black pixels for each colour channels
                 if(frame[int(self.rows-row-1),int(column-1),0]==0 and frame[int(self.rows-row-1),int(column-1),1]==0 and frame[int(self.rows-row-1),int(column-1),2]==0):
                     if(self.validMove(row,column) == True and self.ObstacleDetection(row,column) == False):
-                        frame[int(self.rows-row-1),int(column)] = [150,150,0]
+                        frame[int(self.rows-row-1),int(column)] = [0,250,0]
+                        out.write(frame)
         
         if(len(backtrack_nodes) > 0):
             for nodes in backtrack_nodes:
@@ -290,45 +309,31 @@ class Node:
         
 def main():
         
-    start_coord_row = 5
-    start_coord_column = 5 
-    goal_coord_row = 130
-    goal_coord_column = 150
-    radius = 0
-    clearance = 0
+    start_coord_row = int(input("Enter the starting row coordinates of the node(1-200):  "))
+    start_coord_column = int(input("Enter the starting column coordinates of the node(1-300):  ")) 
+    goal_coord_row = int(input("Enter the starting goal node row coordintes(1-200):  "))
+    goal_coord_column = int(input("Enter the starting goal node column coordinates(1-300):  "))
+    radius = int(input("Enter the radius of the rigid robot. Enter 0 if you want a simulation for a point robot:  "))
+    clearance = int(input("Enter the max clearnace you want the robot to maintain from an obstacle. Enter 0 if you want a simulation for a point robot:  "))
         
     start_coord = (start_coord_row,start_coord_column)
     goal_coord = (goal_coord_row, goal_coord_column)
         
     dijkstra = Node(start_coord,goal_coord,radius,clearance)
         
-    if(dijkstra.validMove(start_coord[0],start_coord[1]) == True):
-        print("Inside First If")
-        if(dijkstra.validMove(goal_coord[0],goal_coord[1]) == True):
-            print("second if")
-            if(dijkstra.ObstacleDetection(start_coord[0],start_coord[1]) == False):
-                if(dijkstra.ObstacleDetection(goal_coord[0],goal_coord[1]) == False):
+    if(dijkstra.validMove(start_coord[0],start_coord[1]) == True and dijkstra.validMove(goal_coord[0],goal_coord[1]) == True and dijkstra.ObstacleDetection(start_coord[0],start_coord[1]) == False and dijkstra.ObstacleDetection(goal_coord[0],goal_coord[1]) == False):
+        
                     (distance_from_start_to_goal, backtrack_states, explored_states) = dijkstra.dijkstra()
                     print(len(backtrack_states))
-                    dijkstra.pathAnimation(explored_states, backtrack_states, "./dijkstra_point.avi")
+                    dijkstra.pathAnimation(explored_states, backtrack_states, "./dijkstra_simulation.avi")
 
                     # print optimal path found or not
                     if(distance_from_start_to_goal == float('inf')):
                         print("\nNo optimal path found.")
                     else:
                         print("\nOptimal path found. Distance is " + str(distance_from_start_to_goal))
-                else:
-                    print("The entered goal node is an obstacle ")
-                    print("Please check README.md file for running Dijkstra_point.py file.")
-            else:
-                print("The entered initial node is an obstacle ")
-                print("Please check README.md file for running Dijkstra_point.py file.")
-        else:
-            print("The entered goal node outside the map ")
-            print("Please check README.md file for running Dijkstra_point.py file.")
     else:
-        print("The entered initial node is outside the map ")
-        print("Please check README.md file for running Dijkstra_point.py file.")
+        print("The entered goal node is an obstacle ")
         
 if __name__ == "__main__":
     main()
