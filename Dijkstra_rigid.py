@@ -18,7 +18,7 @@ if(dijkstra.validMove(start_coord[0],start_coord[1]) == True and dijkstra.validM
 
     (distance_from_start_to_goal, backtrack_states, explored_states) = dijkstra.dijkstra()
     print(len(backtrack_states))
-    dijkstra.pathAnimation(explored_states, backtrack_states, "./dijkstra_simulation_point.avi")
+    dijkstra.pathAnimation(explored_states, backtrack_states, "./dijkstra_simulation_rigid.avi")
 
     # print optimal path found or not
     if(distance_from_start_to_goal == float('inf')):
